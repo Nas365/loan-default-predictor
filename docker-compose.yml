@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile          # your API Dockerfile at project root
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # hot-swap model file without rebuilding the image (optional but handy)
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+
+  ui:
+    build:
+      context: .
+      dockerfile: services/svc-ui/Dockerfile
+    environment:
+      # inside Docker network, UI calls API by service name "api"
+      - API_URL=http://api:8080
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started     # if your API image has a HEALTHCHECK you can use: service_healthy
