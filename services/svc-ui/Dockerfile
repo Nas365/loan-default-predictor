@@ -4,6 +4,6 @@ WORKDIR /app
 COPY services/svc-ui/requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY services/svc-ui/ ./services/svc-ui/
+COPY artifacts/ ./artifacts/
 EXPOSE 8501
-# API_URL will be provided as env var in cloud
 CMD ["streamlit", "run", "services/svc-ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
