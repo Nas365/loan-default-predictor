@@ -6,4 +6,10 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY services/svc-ui/ ./services/svc-ui/
 COPY artifacts/ ./artifacts/
 EXPOSE 8501
-CMD ["streamlit", "run", "services/svc-ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "services/svc-ui/streamlit_app.py",
+     "--server.port=8501",
+     "--server.address=0.0.0.0",
+     "--server.enableCORS=false",
+     "--server.enableXsrfProtection=false",
+     "--browser.gatherUsageStats=false"]
+
