@@ -1,4 +1,4 @@
-import os, base64, pathlib
+import base64, pathlib
 import streamlit as st
 import pandas as pd
 import joblib
@@ -38,14 +38,25 @@ def set_background(image_path: str):
             unsafe_allow_html=True,
         )
 
+# this path is inside your repo
 set_background("services/svc-ui/assets/bg.jpg")
 
-BUNDLE = joblib.load(pathlib.Path("artifacts/loan_default_xgb.joblib"))
-MODEL = BUNDLE["model"]
-THRESH = float(BUNDLE["threshold"])
-FEATURES = BUNDLE["features"]
+@st.cache_resource(show_spinner=False)
+def load_bundle():
+    path = pathlib.Path("artifacts/loan_default_xgb.joblib")
+    return joblib.load(path)
+
+try:
+    BUNDLE = load_bundle()
+    MODEL = BUNDLE["model"]
+    THRESH = float(BUNDLE["threshold"])
+    FEATURES = BUNDLE["features"]
+except Exception as e:
+    st.error(f"Failed to load model bundle: {e}")
+    st.stop()
 
 st.title("💳 Loan Default Predictor")
+
 left, right = st.columns([1.35, 0.9])
 
 with left:
@@ -79,7 +90,7 @@ with left:
             "Number_of_Dependents": int(deps),
         }
         X = pd.DataFrame([row])[FEATURES]
-        p = float(MODEL.predict_proba(X)[:,1][0])
+        p = float(MODEL.predict_proba(X)[:, 1][0])
         decision = "HIGH_RISK" if p >= THRESH else "LOW_RISK"
         st.metric("Probability of Default", f"{p:.2%}")
         if decision == "HIGH_RISK":
@@ -98,6 +109,3 @@ with right:
     st.markdown('<div class="feature-card">Real Estate Loans = number of mortgages or property loans.</div>', unsafe_allow_html=True)
     st.markdown('<div class="feature-card">Dependents = people you support financially (e.g., children).</div>', unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
-
-
-

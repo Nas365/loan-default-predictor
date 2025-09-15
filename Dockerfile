@@ -1,15 +1,21 @@
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl ca-certificates && rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    STREAMLIT_SERVER_HEADLESS=true \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY services/svc_api/requirements.txt ./requirements.txt
+
+# Installig deps
+COPY services/svc-ui/requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY services/svc_api/ ./services/svc_api/
+# Copying model & app files
 COPY artifacts/ ./artifacts/
+COPY services/svc-ui/ ./services/svc-ui/
 
-EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=3s --retries=5 CMD curl -fsS http://localhost:8080/healthz || exit 1
-CMD ["uvicorn", "services.svc_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
+EXPOSE 8501
+CMD ["sh", "-c", "streamlit run services/svc-ui/streamlit_app.py --server.port=${PORT:-8501} --server.address=0.0.0.0"]
