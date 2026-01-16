@@ -16,6 +16,7 @@ COPY artifacts/ ./artifacts/
 COPY services/svc-ui/ ./services/svc-ui/
 
 EXPOSE 8501
-CMD ["streamlit", "run", "services/svc-ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "services/svc-ui/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=$PORT"]
+
 
 
