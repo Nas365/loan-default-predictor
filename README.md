@@ -61,7 +61,7 @@ Every push to `main` triggers a workflow that rebuilds and redeploys the contain
 
 
 ##  Live Demo
-👉 [Loan Default Predictor App](https://loan-default-predictor-45986ae9d37b.herokuapp.com/)  
+👉 [Loan Default Predictor App](https://loan-default-predictor-001q.onrender.com/)  
 
 
 
